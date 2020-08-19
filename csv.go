@@ -23,7 +23,7 @@ func ReadCsv(f io.Reader) <-chan map[string]string {
 			record, err := r.Read()
 			if err != nil {
 				if err == io.EOF {
-					log.Println("finish read csvutil file")
+					log.Println("FINISH CSV data")
 					return
 				} else {
 					log.Fatal(err)
