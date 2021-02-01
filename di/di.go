@@ -23,7 +23,7 @@ type Container struct {
 
 func Load(data interface{}) error {
 	rtype := reflect.TypeOf(data)
-	rv := reflect.ValueOf(rtype)
+	rv := reflect.ValueOf(data)
 
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
 		return errors.New("not a pointer")
@@ -34,7 +34,7 @@ func Load(data interface{}) error {
 	service := container.services[name]
 
 	if service != nil {
-		data = service
+		rv.Elem().Set(reflect.ValueOf(service).Elem())
 	} else {
 		var once sync.Once
 		once.Do(func() {
@@ -69,4 +69,3 @@ func init() {
 		}
 	})
 }
-
