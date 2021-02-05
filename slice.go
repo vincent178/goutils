@@ -8,3 +8,7 @@ func Contains(s []string, e string) bool {
 	}
 	return false
 }
+
+func Merge(s1, s2 []string) []string {
+	return append(s1, s2...)
+}

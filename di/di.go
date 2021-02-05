@@ -7,8 +7,6 @@ import (
 	"sync"
 )
 
-var container *Container
-
 type Initializer interface {
 	Init() error
 }
@@ -20,6 +18,10 @@ type Closer interface {
 type Container struct {
 	services map[string]interface{}
 	m        sync.RWMutex
+}
+
+var container = &Container{
+	services: make(map[string]interface{}),
 }
 
 func Load(data interface{}) error {
@@ -64,13 +66,4 @@ func Close() error {
 		}
 	}
 	return nil
-}
-
-func init() {
-	var once sync.Once
-	once.Do(func() {
-		container = &Container{
-			services: map[string]interface{}{},
-		}
-	})
 }
