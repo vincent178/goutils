@@ -19,7 +19,7 @@ type Closer interface {
 
 type Container struct {
 	services map[string]interface{}
-	m sync.Mutex
+	m        sync.RWMutex
 }
 
 func Load(data interface{}) error {
@@ -32,9 +32,9 @@ func Load(data interface{}) error {
 
 	name := rtype.Elem().Name()
 
-	container.m.Lock()
+	container.m.RLock()
 	service := container.services[name]
-	container.m.Unlock()
+	container.m.RUnlock()
 
 	if service != nil {
 		rv.Elem().Set(reflect.ValueOf(service).Elem())
@@ -46,7 +46,9 @@ func Load(data interface{}) error {
 					log.Fatal("init error", err)
 				}
 			}
+			container.m.Lock()
 			container.services[name] = data
+			container.m.Unlock()
 		})
 	}
 

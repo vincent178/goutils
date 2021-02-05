@@ -1,18 +1,20 @@
 package di
 
 import (
-	"github.com/stretchr/testify/assert"
+	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type TestService struct {
-	init bool
-	closed bool
+	init        bool
+	closed      bool
 	nestService *NestService
 }
 
 type NestService struct {
-	init bool
+	init   bool
 	closed bool
 }
 
@@ -37,6 +39,27 @@ func (s *TestService) Close() error {
 }
 
 func TestLoad(t *testing.T) {
+	// run with --race flag
+	t.Run("detect race condition", func(t *testing.T) {
+		var wg sync.WaitGroup
+
+		wg.Add(2)
+		go func() {
+			defer wg.Done()
+
+			var t1 TestService
+			Load(&t1)
+		}()
+
+		go func() {
+			defer wg.Done()
+			var t2 NestService
+			Load(&t2)
+		}()
+
+		wg.Wait()
+	})
+
 	t.Run("load service", func(t *testing.T) {
 		var ts TestService
 		err := Load(&ts)
