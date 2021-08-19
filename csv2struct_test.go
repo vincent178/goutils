@@ -1,6 +1,7 @@
 package goutils
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -52,9 +53,14 @@ func TestMapToStruct(t *testing.T) {
 			err := CsvMapToStruct(tt.args.src, tt.args.out)
 			assert.NoError(t, err)
 
+			var age int
+			if tt.args.src["Age"] != "" {
+				age, _ = strconv.Atoi(tt.args.src["Age"])
+			}
+
 			p := tt.args.out.(*person)
 			assert.Equal(t, p.Name, "Jojo")
-			assert.Equal(t, p.Age, uint(0))
+			assert.Equal(t, p.Age, uint(age))
 			assert.Equal(t, p.Height, 188)
 			assert.Equal(t, p.IsTeacher, false)
 		})

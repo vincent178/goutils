@@ -21,7 +21,11 @@ type Person struct {
 func CsvMapToStruct(src map[string]string, out interface{}) error {
 	rv := reflect.ValueOf(out)
 
-	if rv.Kind() != reflect.Ptr || rv.IsNil() {
+	if rv.IsNil() {
+		return errors.New("invalid nil out")
+	}
+
+	if !(rv.Kind() == reflect.Ptr || rv.Kind() == reflect.Interface) {
 		return errors.New("invalid type")
 	}
 
