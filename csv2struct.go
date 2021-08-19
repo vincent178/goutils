@@ -6,6 +6,10 @@ import (
 	"strconv"
 )
 
+var (
+	errNotImplement = errors.New("not implement")
+)
+
 /*
 CsvMapToStruct use csv tag
 
@@ -35,12 +39,35 @@ func CsvMapToStruct(src map[string]string, out interface{}) error {
 		switch e.Type().Field(i).Type.Kind() {
 		case reflect.String:
 			e.Field(i).SetString(val)
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			num, err := strconv.Atoi(val)
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			x, err := strconv.ParseUint(val, 10, 64)
 			if err != nil {
 				return err
 			}
-			e.Field(i).SetInt(int64(num))
+			e.Field(i).SetUint(x)
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			x, err := strconv.ParseInt(val, 10, 64)
+			if err != nil {
+				return err
+			}
+			e.Field(i).SetInt(x)
+		case reflect.Float32, reflect.Float64:
+			x, err := strconv.ParseFloat(val, 64)
+			if err != nil {
+				return err
+			}
+			e.Field(i).SetFloat(x)
+		case reflect.Bool:
+			x, err := strconv.ParseBool(val)
+			if err != nil {
+				return err
+			}
+			e.Field(i).SetBool(x)
+		case reflect.Complex64, reflect.Complex128:
+		case reflect.Slice, reflect.Array, reflect.Map, reflect.Struct:
+			// TODO: handle Ptr
+		case reflect.Ptr:
+			return errNotImplement
 		}
 	}
 

@@ -7,8 +7,10 @@ import (
 )
 
 type person struct {
-	Name string `csv:"Name"`
-	Age  int    `csv:"Age"`
+	Name      string `csv:"Name"`
+	Age       uint   `csv:"Age"`
+	Height    int    `csv:"Height"`
+	IsTeacher bool   `csv:"Is Teacher"`
 }
 
 func TestMapToStruct(t *testing.T) {
@@ -24,20 +26,25 @@ func TestMapToStruct(t *testing.T) {
 			name: "unmarshal to struct",
 			args: args{
 				src: map[string]string{
-					"Name": "Jojo",
-					"Age":  "100",
+					"Name":       "Jojo",
+					"Age":        "22",
+					"Height":     "188",
+					"Is Teacher": "false",
 				},
 				out: &person{},
 			},
 		},
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			CsvMapToStruct(tt.args.src, tt.args.out)
+			err := CsvMapToStruct(tt.args.src, tt.args.out)
+			assert.NoError(t, err)
+
 			p := tt.args.out.(*person)
 			assert.Equal(t, p.Name, "Jojo")
-			assert.Equal(t, p.Age, 100)
+			assert.Equal(t, p.Age, uint(22))
+			assert.Equal(t, p.Height, 188)
+			assert.Equal(t, p.IsTeacher, false)
 		})
 	}
 }
