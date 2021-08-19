@@ -14,6 +14,8 @@ type person struct {
 	IsTeacher bool   `csv:"Is Teacher"`
 }
 
+var pi interface{} = &person{}
+
 func TestMapToStruct(t *testing.T) {
 	type args struct {
 		src map[string]string
@@ -45,6 +47,18 @@ func TestMapToStruct(t *testing.T) {
 					"Is Teacher": "false",
 				},
 				out: &person{},
+			},
+		},
+		{
+			name: "with interface out",
+			args: args{
+				src: map[string]string{
+					"Name":       "Jojo",
+					"Age":        "",
+					"Height":     "188",
+					"Is Teacher": "false",
+				},
+				out: pi,
 			},
 		},
 	}
