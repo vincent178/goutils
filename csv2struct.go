@@ -36,10 +36,25 @@ func CsvMapToStruct(src map[string]string, out interface{}) error {
 		key := e.Type().Field(i).Tag.Get("csv")
 		val := src[key]
 
+		if !e.Field(i).CanSet() {
+			continue
+		}
+
+		// handle empty value
+		if val == "" {
+			e.Field(i).Set(e.Field(i))
+			continue
+		}
+
 		switch e.Type().Field(i).Type.Kind() {
 		case reflect.String:
 			e.Field(i).SetString(val)
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			if val == "" {
+				e.Field(i).SetUint(0)
+				continue
+			}
+
 			x, err := strconv.ParseUint(val, 10, 64)
 			if err != nil {
 				return err

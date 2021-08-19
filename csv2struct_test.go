@@ -34,6 +34,18 @@ func TestMapToStruct(t *testing.T) {
 				out: &person{},
 			},
 		},
+		{
+			name: "with empty value",
+			args: args{
+				src: map[string]string{
+					"Name":       "Jojo",
+					"Age":        "",
+					"Height":     "188",
+					"Is Teacher": "false",
+				},
+				out: &person{},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -42,7 +54,7 @@ func TestMapToStruct(t *testing.T) {
 
 			p := tt.args.out.(*person)
 			assert.Equal(t, p.Name, "Jojo")
-			assert.Equal(t, p.Age, uint(22))
+			assert.Equal(t, p.Age, uint(0))
 			assert.Equal(t, p.Height, 188)
 			assert.Equal(t, p.IsTeacher, false)
 		})
