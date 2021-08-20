@@ -1,7 +1,6 @@
 package goutils
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,13 +17,14 @@ var pi interface{} = &person{}
 
 func TestMapToStruct(t *testing.T) {
 	type args struct {
-		src map[string]string
-		out interface{}
+		src           map[string]string
+		suppressError bool
+		out           interface{}
 	}
 	tests := []struct {
-		name          string
-		args          args
-		suppressError bool
+		name string
+		args args
+		want *person
 	}{
 		{
 			name: "unmarshal to struct",
@@ -36,6 +36,12 @@ func TestMapToStruct(t *testing.T) {
 					"Is Teacher": "false",
 				},
 				out: &person{},
+			},
+			want: &person{
+				Name:      "Jojo",
+				Age:       22,
+				Height:    188,
+				IsTeacher: false,
 			},
 		},
 		{
@@ -49,6 +55,12 @@ func TestMapToStruct(t *testing.T) {
 				},
 				out: &person{},
 			},
+			want: &person{
+				Name:      "Jojo",
+				Age:       0,
+				Height:    188,
+				IsTeacher: false,
+			},
 		},
 		{
 			name: "with interface out",
@@ -61,6 +73,12 @@ func TestMapToStruct(t *testing.T) {
 				},
 				out: pi,
 			},
+			want: &person{
+				Name:      "Jojo",
+				Age:       0,
+				Height:    188,
+				IsTeacher: false,
+			},
 		},
 		{
 			name: "with invalid value error",
@@ -71,15 +89,23 @@ func TestMapToStruct(t *testing.T) {
 					"Height":     "L",
 					"Is Teacher": "false",
 				},
-				out: pi,
+				suppressError: true,
+				out:           &person{},
 			},
-			suppressError: true,
+			want: &person{
+				Name:      "Jojo",
+				Age:       0,
+				Height:    0,
+				IsTeacher: false,
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			//pi = &person{}
+
 			var err error
-			if tt.suppressError {
+			if tt.args.suppressError {
 				err = CsvMapToStruct(tt.args.src, tt.args.out, WithSuppressError(true))
 			} else {
 				err = CsvMapToStruct(tt.args.src, tt.args.out)
@@ -87,21 +113,8 @@ func TestMapToStruct(t *testing.T) {
 
 			assert.NoError(t, err)
 
-			var age int
-			if tt.args.src["Age"] != "" {
-				age, _ = strconv.Atoi(tt.args.src["Age"])
-			}
-
-			height := 188
-			if tt.args.src["Height"] == "L" {
-				height = 0
-			}
-
 			p := tt.args.out.(*person)
-			assert.Equal(t, p.Name, "Jojo")
-			assert.Equal(t, p.Age, uint(age))
-			assert.Equal(t, p.Height, height)
-			assert.Equal(t, p.IsTeacher, false)
+			assert.Equal(t, p, tt.want)
 		})
 	}
 }
