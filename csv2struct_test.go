@@ -22,8 +22,9 @@ func TestMapToStruct(t *testing.T) {
 		out interface{}
 	}
 	tests := []struct {
-		name string
-		args args
+		name          string
+		args          args
+		suppressError bool
 	}{
 		{
 			name: "unmarshal to struct",
@@ -61,10 +62,29 @@ func TestMapToStruct(t *testing.T) {
 				out: pi,
 			},
 		},
+		{
+			name: "with invalid value error",
+			args: args{
+				src: map[string]string{
+					"Name":       "Jojo",
+					"Age":        "",
+					"Height":     "L",
+					"Is Teacher": "false",
+				},
+				out: pi,
+			},
+			suppressError: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := CsvMapToStruct(tt.args.src, tt.args.out)
+			var err error
+			if tt.suppressError {
+				err = CsvMapToStruct(tt.args.src, tt.args.out, WithSuppressError(true))
+			} else {
+				err = CsvMapToStruct(tt.args.src, tt.args.out)
+			}
+
 			assert.NoError(t, err)
 
 			var age int
@@ -72,10 +92,15 @@ func TestMapToStruct(t *testing.T) {
 				age, _ = strconv.Atoi(tt.args.src["Age"])
 			}
 
+			height := 188
+			if tt.args.src["Height"] == "L" {
+				height = 0
+			}
+
 			p := tt.args.out.(*person)
 			assert.Equal(t, p.Name, "Jojo")
 			assert.Equal(t, p.Age, uint(age))
-			assert.Equal(t, p.Height, 188)
+			assert.Equal(t, p.Height, height)
 			assert.Equal(t, p.IsTeacher, false)
 		})
 	}

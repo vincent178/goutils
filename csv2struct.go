@@ -10,6 +10,16 @@ var (
 	errNotImplement = errors.New("not implement")
 )
 
+type option struct {
+	SuppressError bool
+}
+
+func WithSuppressError(suppressError bool) func(*option) {
+	return func(o *option) {
+		o.SuppressError = suppressError
+	}
+}
+
 /*
 CsvMapToStruct use csv tag
 
@@ -18,7 +28,12 @@ type Person struct {
 	Age int     `csv:"Age"`
 }
 */
-func CsvMapToStruct(src map[string]string, out interface{}) error {
+func CsvMapToStruct(src map[string]string, out interface{}, options ...func(*option)) error {
+	var o option
+	for _, f := range options {
+		f(&o)
+	}
+
 	rv := reflect.ValueOf(out)
 
 	if rv.IsNil() {
@@ -54,31 +69,46 @@ func CsvMapToStruct(src map[string]string, out interface{}) error {
 		case reflect.String:
 			e.Field(i).SetString(val)
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			if val == "" {
-				e.Field(i).SetUint(0)
-				continue
-			}
-
 			x, err := strconv.ParseUint(val, 10, 64)
 			if err != nil {
+				if o.SuppressError {
+					// set default value
+					e.Field(i).Set(e.Field(i))
+					continue
+				}
 				return err
 			}
 			e.Field(i).SetUint(x)
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			x, err := strconv.ParseInt(val, 10, 64)
 			if err != nil {
+				if o.SuppressError {
+					// set default value
+					e.Field(i).Set(e.Field(i))
+					continue
+				}
 				return err
 			}
 			e.Field(i).SetInt(x)
 		case reflect.Float32, reflect.Float64:
 			x, err := strconv.ParseFloat(val, 64)
 			if err != nil {
+				if o.SuppressError {
+					// set default value
+					e.Field(i).Set(e.Field(i))
+					continue
+				}
 				return err
 			}
 			e.Field(i).SetFloat(x)
 		case reflect.Bool:
 			x, err := strconv.ParseBool(val)
 			if err != nil {
+				if o.SuppressError {
+					// set default value
+					e.Field(i).Set(e.Field(i))
+					continue
+				}
 				return err
 			}
 			e.Field(i).SetBool(x)
