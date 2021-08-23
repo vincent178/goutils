@@ -20,14 +20,7 @@ func WithSuppressError(suppressError bool) func(*option) {
 	}
 }
 
-/*
-CsvMapToStruct use csv tag
-
-type Person struct {
-	Name string `csv:"Name"`
-	Age int     `csv:"Age"`
-}
-*/
+// CsvMapToStruct use csv tag unmarshal to struct
 func CsvMapToStruct(src map[string]string, out interface{}, options ...func(*option)) error {
 	var o option
 	for _, f := range options {

@@ -93,16 +93,15 @@ func TestMapToStruct(t *testing.T) {
 				out:           &person{},
 			},
 			want: &person{
-				Name:      "Jojo",
-				Age:       0,
-				Height:    0,
-				IsTeacher: false,
+				Name:   "Jojo",
+				Age:    0,
+				Height: 0,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//pi = &person{}
+			pi = &person{}
 
 			var err error
 			if tt.args.suppressError {
