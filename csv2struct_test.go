@@ -101,8 +101,6 @@ func TestMapToStruct(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pi = &person{}
-
 			var err error
 			if tt.args.suppressError {
 				err = CsvMapToStruct(tt.args.src, tt.args.out, WithSuppressError(true))
