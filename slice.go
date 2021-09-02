@@ -1,6 +1,10 @@
 package goutils
 
-func Contains(s []string, e string) bool {
+//type Comparable interface {
+//
+//}
+
+func Contains[T comparable](s []T, e T) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -9,6 +13,6 @@ func Contains(s []string, e string) bool {
 	return false
 }
 
-func Merge(s1, s2 []string) []string {
+func Merge[T any](s1, s2 []T) []T {
 	return append(s1, s2...)
 }

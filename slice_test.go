@@ -64,3 +64,39 @@ func TestMerge(t *testing.T) {
 		})
 	}
 }
+
+func TestContains(t *testing.T) {
+	type args struct {
+		s []interface{}
+		e interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "string",
+			args: args{
+				s: []interface{}{"1", "2", "3"},
+				e: "1",
+			},
+			want: true,
+		},
+		{
+			name: "int",
+			args: args{
+				s: []interface{}{1, 2, 3},
+				e: 1,
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Contains(tt.args.s, tt.args.e); got != tt.want {
+				t.Errorf("Contains() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
