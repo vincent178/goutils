@@ -19,6 +19,7 @@ func TestMapToStruct(t *testing.T) {
 	type args struct {
 		src           map[string]string
 		suppressError bool
+		caseInsensive bool
 		out           interface{}
 	}
 	tests := []struct {
@@ -98,12 +99,34 @@ func TestMapToStruct(t *testing.T) {
 				Height: 0,
 			},
 		},
+		{
+			name: "with caseInsensive true",
+			args: args{
+				src: map[string]string{
+					"Name":       "Jojo",
+					"age":        "",
+					"height":     "188",
+					"is teacher": "true",
+				},
+				caseInsensive: true,
+				out:           &person{},
+			},
+			want: &person{
+				Name:      "Jojo",
+				Age:       0,
+				Height:    188,
+				IsTeacher: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 			if tt.args.suppressError {
 				err = CsvMapToStruct(tt.args.src, tt.args.out, WithSuppressError(true))
+
+			} else if tt.args.caseInsensive {
+				err = CsvMapToStruct(tt.args.src, tt.args.out, WithCaseInsensitive(true))
 			} else {
 				err = CsvMapToStruct(tt.args.src, tt.args.out)
 			}

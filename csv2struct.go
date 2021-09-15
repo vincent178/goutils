@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -11,12 +12,19 @@ var (
 )
 
 type option struct {
-	SuppressError bool
+	SuppressError   bool
+	CaseInsensitive bool
 }
 
 func WithSuppressError(suppressError bool) func(*option) {
 	return func(o *option) {
 		o.SuppressError = suppressError
+	}
+}
+
+func WithCaseInsensitive(caseInsensitive bool) func(*option) {
+	return func(o *option) {
+		o.CaseInsensitive = caseInsensitive
 	}
 }
 
@@ -46,7 +54,21 @@ func CsvMapToStruct(src map[string]string, out interface{}, options ...func(*opt
 	for i := 0; i < e.NumField(); i++ {
 		// get map key and value
 		key := e.Type().Field(i).Tag.Get("csv")
-		val := src[key]
+
+		var val string
+		for k, v := range src {
+			if o.CaseInsensitive {
+				if strings.EqualFold(k, key) {
+					val = v
+					break
+				}
+			} else {
+				if k == key {
+					val = v
+					break
+				}
+			}
+		}
 
 		if !e.Field(i).CanSet() {
 			continue
