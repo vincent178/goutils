@@ -1,5 +1,5 @@
 module github.com/vincent178/goutils
 
-go 1.14
+go 1.18
 
 require github.com/stretchr/testify v1.7.0 // indirect
