@@ -10,6 +10,7 @@ func ReadCsv(f io.Reader) <-chan map[string]string {
 	r := csv.NewReader(f)
 	r.ReuseRecord = true
 	r.TrimLeadingSpace = true
+	r.LazyQuotes = true
 
 	ch := make(chan map[string]string)
 
